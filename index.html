@@ -406,6 +406,50 @@
           opacity: 0.3;
         }
 
+        /* Floating Dots Background */
+        .floating-dots {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1;
+          overflow: hidden;
+        }
+
+        .floating-dot {
+          position: absolute;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, rgba(255, 215, 0, 0.4) 50%, rgba(255, 215, 0, 0.1) 100%);
+          animation: floatDot linear infinite;
+          opacity: 0;
+        }
+
+        .floating-dot.small {
+          width: 3px;
+          height: 3px;
+          animation-duration: 15s;
+        }
+
+        .floating-dot.medium {
+          width: 5px;
+          height: 5px;
+          animation-duration: 20s;
+        }
+
+        .floating-dot.large {
+          width: 8px;
+          height: 8px;
+          animation-duration: 25s;
+        }
+
+        .floating-dot.extra-large {
+          width: 12px;
+          height: 12px;
+          animation-duration: 30s;
+        }
+
         /* Shape-Forming Particle System */
         .particles-container {
           position: absolute;
@@ -577,6 +621,23 @@
           100% { transform: translate(100px, 100px); }
         }
 
+        @keyframes floatDot {
+          0% {
+            transform: translateY(100vh) translateX(0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-20vh) translateX(100px) rotate(360deg);
+            opacity: 0;
+          }
+        }
+
         @keyframes fadeInUp {
           to { opacity: 1; transform: translateY(0); }
         }
@@ -713,6 +774,9 @@
     <!-- Skip to main content link for screen readers -->
     <a href="#main-content" class="skip-link" aria-label="Skip to main content">Skip to main content</a>
 
+    <!-- Floating Dots Background -->
+    <div class="floating-dots" id="floating-dots"></div>
+
     <!-- Header -->
     <header role="banner" class="header" id="header">
         <nav role="navigation" class="nav container" aria-label="Main navigation">
@@ -808,6 +872,137 @@
     </main>
 
     <script>
+        // Floating Dots Background System
+        class FloatingDotsBackground {
+            constructor() {
+                this.container = document.getElementById('floating-dots');
+                this.dots = [];
+                this.maxDots = 25;
+                this.isRunning = false;
+                
+                if (!this.container) return;
+                
+                // Respect user's motion preferences
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    this.maxDots = 5; // Fewer dots for reduced motion
+                }
+                
+                this.init();
+            }
+
+            init() {
+                this.isRunning = true;
+                this.createInitialDots();
+                this.startDotGeneration();
+            }
+
+            createInitialDots() {
+                // Create some initial dots at random positions
+                for (let i = 0; i < Math.floor(this.maxDots / 3); i++) {
+                    setTimeout(() => {
+                        if (this.isRunning) this.createDot();
+                    }, Math.random() * 3000);
+                }
+            }
+
+            startDotGeneration() {
+                this.dotInterval = setInterval(() => {
+                    if (this.dots.length < this.maxDots && this.isRunning) {
+                        this.createDot();
+                    }
+                }, 800 + Math.random() * 1200); // Every 0.8-2 seconds
+            }
+
+            createDot() {
+                const dot = document.createElement('div');
+                dot.className = 'floating-dot';
+                
+                // Random size class
+                const sizes = ['small', 'medium', 'large', 'extra-large'];
+                const weights = [0.4, 0.3, 0.2, 0.1]; // Higher probability for smaller dots
+                const sizeClass = this.weightedRandom(sizes, weights);
+                dot.classList.add(sizeClass);
+                
+                // Random horizontal position
+                const startX = Math.random() * window.innerWidth;
+                dot.style.left = startX + 'px';
+                
+                // Random horizontal drift
+                const driftX = (Math.random() - 0.5) * 200;
+                dot.style.setProperty('--drift-x', driftX + 'px');
+                
+                // Slight variation in animation duration
+                const baseDuration = this.getBaseDuration(sizeClass);
+                const variation = (Math.random() - 0.5) * 0.3; // ±30% variation
+                const finalDuration = baseDuration * (1 + variation);
+                dot.style.animationDuration = finalDuration + 's';
+                
+                // Random delay before starting
+                const delay = Math.random() * 2;
+                dot.style.animationDelay = delay + 's';
+                
+                // Add some color variation
+                const colorVariations = [
+                    'rgba(255, 215, 0, 0.8)', // Gold
+                    'rgba(255, 255, 255, 0.6)', // White
+                    'rgba(255, 183, 0, 0.7)', // Darker gold
+                    'rgba(255, 235, 59, 0.5)'  // Light gold
+                ];
+                const color = colorVariations[Math.floor(Math.random() * colorVariations.length)];
+                dot.style.background = `radial-gradient(circle, ${color} 0%, ${color.replace(/[\d\.]+\)$/g, '0.2)')} 50%, transparent 100%)`;
+                
+                this.container.appendChild(dot);
+                this.dots.push(dot);
+                
+                // Remove dot after animation completes
+                setTimeout(() => {
+                    this.removeDot(dot);
+                }, (finalDuration + delay) * 1000);
+            }
+
+            getBaseDuration(sizeClass) {
+                const durations = {
+                    'small': 15,
+                    'medium': 20,
+                    'large': 25,
+                    'extra-large': 30
+                };
+                return durations[sizeClass] || 20;
+            }
+
+            weightedRandom(items, weights) {
+                let sum = weights.reduce((a, b) => a + b, 0);
+                let random = Math.random() * sum;
+                
+                for (let i = 0; i < items.length; i++) {
+                    random -= weights[i];
+                    if (random <= 0) {
+                        return items[i];
+                    }
+                }
+                return items[items.length - 1];
+            }
+
+            removeDot(dot) {
+                if (dot && dot.parentNode) {
+                    dot.parentNode.removeChild(dot);
+                    const index = this.dots.indexOf(dot);
+                    if (index > -1) {
+                        this.dots.splice(index, 1);
+                    }
+                }
+            }
+
+            destroy() {
+                this.isRunning = false;
+                if (this.dotInterval) {
+                    clearInterval(this.dotInterval);
+                }
+                this.dots.forEach(dot => this.removeDot(dot));
+                this.dots = [];
+            }
+        }
+
         // Enhanced Shape-Forming Particle System
         class ShapeFormingParticleSystem {
             constructor() {
@@ -1399,6 +1594,9 @@
                     this.components.headerScrollEffects = new HeaderScrollEffects();
                     this.components.scrollAnimations = new ScrollAnimations();
 
+                    // Initialize floating dots background
+                    this.components.floatingDots = new FloatingDotsBackground();
+
                     // Initialize shape-forming particle system
                     setTimeout(() => {
                         this.components.shapeFormingParticles = new ShapeFormingParticleSystem();
@@ -1412,7 +1610,7 @@
                     // Mark app as loaded
                     document.body.classList.add('loaded');
 
-                    console.log('🚀 Catalyst Enterprise Intelligence - Enhanced Landing Page with Shape-Forming Particles Loaded!');
+                    console.log('🚀 Catalyst Enterprise Intelligence - Enhanced Landing Page with Floating Dots & Shape-Forming Particles Loaded!');
                 } catch (error) {
                     console.error('Error initializing Catalyst app:', error);
                 }
