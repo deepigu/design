@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Shape Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+            height: 100vh;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        .animation-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .particle.falling {
+            animation: particleFall 3s ease-in-out forwards;
+        }
+
+        .particle.joined {
+            animation: joinShape 1s ease-in-out forwards;
+        }
+
+        .shape-formation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            z-index: 2;
+        }
+
+        .formed-shape {
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .formed-shape.visible {
+            opacity: 1;
+            animation: shapeGlow 2s ease-in-out infinite;
+        }
+
+        .restart-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #FFD700;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        @keyframes particleFall {
+            0% {
+                transform: translateY(-100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes joinShape {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.8);
+                opacity: 0.9;
+            }
+        }
+
+        @keyframes shapeGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+            }
+            50% {
+                filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1)) drop-shadow(0 0 50px rgba(255, 215, 0, 0.8));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="animation-container">
+        <div class="particles-container" id="particles-container"></div>
+        
+        <div class="shape-formation" id="shape-formation">
+            <svg class="formed-shape" id="formed-shape" width="300" height="300" viewBox="0 0 300 300">
+                <!-- Heart Shape -->
+                <path d="M150,250 C150,250 50,150 50,100 C50,75 75,50 100,50 C125,50 150,75 150,100 C150,75 175,50 200,50 C225,50 250,75 250,100 C250,150 150,250 150,250 Z" 
+                      fill="none" 
+                      stroke="#FFD700" 
+                      stroke-width="3" 
+                      stroke-dasharray="5,5">
+                    <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+                </path>
+				
+				   <!-- circle Shape -->
+                <circle cx="150" cy="150" r="100" 
+        fill="none" 
+        stroke="#FFD700" 
+        stroke-width="3" 
+        stroke-dasharray="5,5">
+    <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+</circle>
+
+   <!-- waves Shape -->
+   
+   <path d="M50,150 Q100,100 150,150 T250,150" 
+      fill="none" 
+      stroke="#FFD700" 
+      stroke-width="3" 
+      stroke-dasharray="5,5">
+    <animate attributeName="stroke-dashoffset" values="0;-20" dur="2s" repeatCount="indefinite"/>
+</path>
+
+<path d="M120,150 C80,100 200,100 160,150 C200,200 80,200 120,150 Z" 
+      fill="none" 
+      stroke="#FFD700" 
+      stroke-width="3" 
+      stroke-dasharray="5,5">
+    <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+</path>
+
+
+<path d="M150,50 L179,111 L245,111 L192,150 L210,215 L150,180 L90,215 L108,150 L55,111 L121,111 Z"
+      fill="none" 
+      stroke="#FFD700" 
+      stroke-width="3" 
+      stroke-dasharray="5,5">
+    <animate attributeName="stroke-dashoffset" values="0;-10" dur="1s" repeatCount="indefinite"/>
+</path>
+<!----Abastra---->
+<path d="M50,150 Q100,80 150,150 T250,150 T350,150"
+      fill="none"
+      stroke="#FFD700"
+      stroke-width="3"
+      stroke-dasharray="10,8">
+    <animate attributeName="stroke-dashoffset" values="0;-25" dur="3s" repeatCount="indefinite"/>
+</path>
+
+
+
+  
+                <!-- Glow effect -->
+                <circle cx="150" cy="150" r="120" fill="none" stroke="url(#glowGradient)" stroke-width="1" opacity="0.3"/>
+                
+                <defs>
+                    <radialGradient id="glowGradient">
+                        <stop offset="0%" stop-color="#FFD700" stop-opacity="0.8"/>
+                        <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+            </svg>
+        </div>
+        
+        <button class="restart-btn" onclick="particleSystem.restart()">🔄 Restart</button>
+    </div>
+
+    <script>
+        class ParticleShapeAnimation {
+            constructor() {
+                this.container = document.getElementById('particles-container');
+                this.shapeContainer = document.getElementById('shape-formation');
+                this.formedShape = document.getElementById('formed-shape');
+                this.particles = [];
+                
+                // Define different shapes
+                this.shapes = {
+                    heart: [
+                        {x: 150, y: 100}, {x: 130, y: 90}, {x: 170, y: 90},
+                        {x: 110, y: 110}, {x: 190, y: 110}, {x: 100, y: 130},
+                        {x: 200, y: 130}, {x: 110, y: 150}, {x: 190, y: 150},
+                        {x: 120, y: 170}, {x: 180, y: 170}, {x: 130, y: 190},
+                        {x: 170, y: 190}, {x: 140, y: 210}, {x: 160, y: 210},
+                        {x: 150, y: 230}, {x: 125, y: 120}, {x: 175, y: 120}
+                    ],
+                    circle: Array.from({length: 20}, (_, i) => {
+                        const angle = (i / 20) * 2 * Math.PI;
+                        return {
+                            x: 150 + 80 * Math.cos(angle),
+                            y: 150 + 80 * Math.sin(angle)
+                        };
+                    }),
+                    star: [
+                        {x: 150, y: 50}, {x: 160, y: 90}, {x: 200, y: 90},
+                        {x: 170, y: 120}, {x: 180, y: 160}, {x: 150, y: 140},
+                        {x: 120, y: 160}, {x: 130, y: 120}, {x: 100, y: 90},
+                        {x: 140, y: 90}, {x: 165, y: 75}, {x: 135, y: 75},
+                        {x: 185, y: 105}, {x: 115, y: 105}, {x: 175, y: 145},
+                        {x: 125, y: 145}, {x: 150, y: 180}, {x: 150, y: 200}
+                    ]
+                };
+                
+                this.shapeKeys = Object.keys(this.shapes);
+                this.currentShapeIndex = 0;
+                this.targetPositions = this.shapes[this.shapeKeys[this.currentShapeIndex]];
+                
+                this.init();
+            }
+
+            init() {
+                // Start animation
+                setTimeout(() => {
+                    this.startParticleAnimation();
+                }, 1000);
+            }
+
+            createParticle(targetIndex) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random starting position at top of screen
+                const startX = Math.random() * window.innerWidth;
+                const startY = -20;
+                
+                // Particle properties
+                const size = Math.random() * 6 + 4; // 4-10px
+                const colors = ['#FFD700', '#FFF', '#FFB700'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const opacity = Math.random() * 0.5 + 0.5; // 0.5-1.0
+                
+                // Get target position relative to shape container
+                const shapeRect = this.shapeContainer.getBoundingClientRect();
+                const containerRect = this.container.getBoundingClientRect();
+                const target = this.targetPositions[targetIndex];
+                
+                const targetX = shapeRect.left - containerRect.left + target.x;
+                const targetY = shapeRect.top - containerRect.top + target.y;
+                
+                particle.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: ${color};
+                    left: ${startX}px;
+                    top: ${startY}px;
+                    opacity: ${opacity};
+                    color: ${color};
+                    z-index: 5;
+                `;
+                
+                this.container.appendChild(particle);
+                
+                // Animate particle to target
+                this.animateParticleToTarget(particle, startX, startY, targetX, targetY, targetIndex);
+                
+                return particle;
+            }
+
+            animateParticleToTarget(particle, startX, startY, targetX, targetY, targetIndex) {
+                particle.classList.add('falling');
+                
+                const fallDistance = window.innerHeight + 100;
+                const fallDuration = 2000 + (Math.random() * 1000);
+                
+                const fallAnimation = particle.animate([
+                    {
+                        transform: `translate(0, 0)`,
+                        opacity: 0
+                    },
+                    {
+                        transform: `translate(0, ${fallDistance * 0.1}px)`,
+                        opacity: 1,
+                        offset: 0.1
+                    },
+                    {
+                        transform: `translate(${(targetX - startX) * 0.7}px, ${fallDistance * 0.7}px)`,
+                        opacity: 1,
+                        offset: 0.7
+                    },
+                    {
+                        transform: `translate(${targetX - startX}px, ${targetY - startY}px)`,
+                        opacity: 0.9
+                    }
+                ], {
+                    duration: fallDuration,
+                    easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                    fill: 'forwards'
+                });
+                
+                fallAnimation.addEventListener('finish', () => {
+                    this.joinParticleToShape(particle, targetIndex);
+                });
+            }
+
+            joinParticleToShape(particle, targetIndex) {
+                particle.classList.add('joined');
+                
+                const joinAnimation = particle.animate([
+                    {
+                        transform: particle.style.transform + ' scale(1)',
+                        opacity: 0.9
+                    },
+                    {
+                        transform: particle.style.transform + ' scale(0.8)',
+                        opacity: 0.8,
+                        filter: 'drop-shadow(0 0 8px #FFD700)'
+                    }
+                ], {
+                    duration: 500,
+                    easing: 'ease-out',
+                    fill: 'forwards'
+                });
+                
+                setTimeout(() => {
+                    this.checkShapeCompletion();
+                }, 600);
+            }
+
+            checkShapeCompletion() {
+                const joinedParticles = this.container.querySelectorAll('.particle.joined');
+                
+                if (joinedParticles.length >= this.targetPositions.length * 0.8) {
+                    this.activateFormedShape();
+                }
+            }
+
+            activateFormedShape() {
+                if (this.formedShape) {
+                    this.formedShape.classList.add('visible');
+                    
+                    setTimeout(() => {
+                        this.fadeOutParticles();
+                    }, 2000);
+                    
+                    // Auto restart with next shape
+                    setTimeout(() => {
+                        this.restart();
+                    }, 6000);
+                }
+            }
+
+            fadeOutParticles() {
+                const particles = this.container.querySelectorAll('.particle');
+                particles.forEach((particle, index) => {
+                    setTimeout(() => {
+                        particle.animate([
+                            { opacity: particle.style.opacity || 0.8 },
+                            { opacity: 0, transform: particle.style.transform + ' scale(0.5)' }
+                        ], {
+                            duration: 800,
+                            easing: 'ease-out',
+                            fill: 'forwards'
+                        }).addEventListener('finish', () => {
+                            particle.remove();
+                        });
+                    }, index * 50);
+                });
+            }
+
+            startParticleAnimation() {
+                // Create particles for each target position
+                this.targetPositions.forEach((target, index) => {
+                    setTimeout(() => {
+                        this.createParticle(index);
+                    }, index * 150 + Math.random() * 200);
+                });
+                
+                // Create additional random particles
+                for (let i = 0; i < 8; i++) {
+                    setTimeout(() => {
+                        const randomTargetIndex = Math.floor(Math.random() * this.targetPositions.length);
+                        this.createParticle(randomTargetIndex);
+                    }, Math.random() * 1500 + 500);
+                }
+            }
+
+            restart() {
+                // Clear particles
+                this.container.innerHTML = '';
+                this.formedShape.classList.remove('visible');
+                
+                // Cycle to next shape
+                this.currentShapeIndex = (this.currentShapeIndex + 1) % this.shapeKeys.length;
+                this.targetPositions = this.shapes[this.shapeKeys[this.currentShapeIndex]];
+                
+                // Restart animation
+                setTimeout(() => {
+                    this.startParticleAnimation();
+                }, 500);
+            }
+        }
+
+        // Initialize the animation
+        const particleSystem = new ParticleShapeAnimation();
+    </script>
+</body>
+</html>
